@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+##Loading the required packages
+```{r,warning=FALSE,message=FALSE}
+library(knitr)
+library(dplyr)
+library(ggplot2)
+```
+
+#Read and summarise the data
+```{r,warning=FALSE,message=FALSE}
+#loans = read.csv("prosperLoanData.csv")
+```
+
+There are 113937 rows of 81 variables in the dataset. The description of each variable is available in the <> file. 
+This analysis will only look into a subset of the 81 variables in the dataset. These variables are listed below
+
+It would be great if some preliminary analysis can be done with a subset of the data.
+```{r}
+cols_interest = c("CreditGrade","Term","LoanStatus","ClosedDate","BorrowerAPR","BorrowerRate","LenderYield","EstimatedEffectiveYield","EstimatedLoss","ProsperRating..Alpha.", "ProsperScore", "BorrowerState", "Occupation","EmploymentStatus", "EmploymentStatusDuration","IsBorrowerHomeowner", "DateCreditPulled", "CreditScoreRangeLower", "CreditScoreRangeUpper", "CurrentCreditLines", "OpenCreditLines","TotalCreditLinespast7years","InquiriesLast6Months","TotalInquiries","CurrentDelinquencies","AmountDelinquent","DelinquenciesLast7Years","DebtToIncomeRatio","IncomeRange","IncomeVerifiable","StatedMonthlyIncome","TotalProsperLoans","TotalProsperPaymentsBilled","OnTimeProsperPayments","ProsperPaymentsLessThanOneMonthLate","ProsperPaymentsOneMonthPlusLate","ProsperPrincipalBorrowed","ProsperPrincipalOutstanding","ScorexChangeAtTimeOfListing","LoanCurrentDaysDelinquent","LoanFirstDefaultedCycleNumber","LoanMonthsSinceOrigination","LoanOriginalAmount","MonthlyLoanPayment","PercentFunded","InvestmentFromFriendsCount","InvestmentFromFriendsAmount","Investors")
+```
+```{r}
+#Checking column names in the above vector variables for typos
+# all_cols = colnames(loans)
+# for (var in variables) {
+#   if (!(var %in% all_cols)){
+#     print (var)
+#   }
+# }
+```
+
+
+#Sanctity check
+- Count the number and  percentage of NA values for the columns listed in cols_interest. Only those columns with at least  one NA value is shown 
+
+```{r}
+all_columns_with_na = colnames(loans)[colSums(is.na(loans))>0]
+cols_interest_with_na = intersect(all_columns_with_na,cols_interest)
+#sum(colSums(is.na(loans))!=0)
+
+#Total NA values in numbers
+colSums(is.na(loans[cols_interest_with_na]))
+#NA values as percentage
+colSums(is.na(loans[cols_interest_with_na]))*100/nrow(loans)
+```
+
+The columns "EstimatedEffectiveYeild","EsimtatedLoss","ProsperScore" have about 25% of their values missing, but that is because as mentinoed in the dataset description, these variables are available only for loans post july 2009. The columns TotalPropserLoans, TotalProsperPaymentsBilled,OnTimeProsperPayments, ProsperPaymentsLessThanOneMonthLate, ProsperPaymentsOneMonthPlusLate, ProsperPrincipalBorrowed,ProsperPrincipalOutstanding and ScorexChangeAtTimeofListing are available only for those applicants who had applied with prosper before. 
+Hence these columns do not require any missing value treatment.
+
+The other columns with missing values have under 10% values missing. These shall be left as it is for now, and we will continue with the analysis. As we move along, we will explore any possibilies of filling in these missing values. 
+
+
+
+#Univariate analysis
+
+- Percentage of different loan statuses
+
+```{r}
+ggplot(data=loans,aes(x=LoanStatus))+geom_bar() + coord_flip()
+
+```
+

@@ -10,11 +10,15 @@ output:
 library(knitr)
 library(dplyr)
 library(ggplot2)
+library(lubridate)
+library(gridExtra)
 ```
 
-#Read and summarise the data
+#Read and summarise the data. 
 ```{r,warning=FALSE,message=FALSE}
 #loans = read.csv("prosperLoanData.csv")
+#for occasional viewing of subset of data
+#loans_sub = loans[1:100,]
 ```
 
 There are 113937 rows of 81 variables in the dataset. The description of each variable is available in the <> file. 
@@ -50,7 +54,7 @@ colSums(is.na(loans[cols_interest_with_na]))*100/nrow(loans)
 ```
 
 The columns "EstimatedEffectiveYeild","EsimtatedLoss","ProsperScore" have about 25% of their values missing, but that is because as mentinoed in the dataset description, these variables are available only for loans post july 2009. The columns TotalPropserLoans, TotalProsperPaymentsBilled,OnTimeProsperPayments, ProsperPaymentsLessThanOneMonthLate, ProsperPaymentsOneMonthPlusLate, ProsperPrincipalBorrowed,ProsperPrincipalOutstanding and ScorexChangeAtTimeofListing are available only for those applicants who had applied with prosper before. 
-Hence these columns do not require any missing value treatment.
+Hence these columns do not require any missing value treatment. Additionally, the column CreditGrade has meaningful values only for those listings pre-2009. For the rest of the loans, it simply has a blank value instead of NA values
 
 The other columns with missing values have under 10% values missing. These shall be left as it is for now, and we will continue with the analysis. As we move along, we will explore any possibilies of filling in these missing values. 
 
@@ -61,7 +65,106 @@ The other columns with missing values have under 10% values missing. These shall
 - Percentage of different loan statuses
 
 ```{r}
-ggplot(data=loans,aes(x=LoanStatus))+geom_bar() + coord_flip()
+ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=LoanStatus))+geom_bar() + scale_y_continuous(labels=percent) +  coord_flip()+ylab("Percentage of loans")
 
 ```
+
+About 50% of the listings are lons are that currently on. Around 33% listings are completed loans whereas 10% of the listings show chargedoff loans. The remaining listings show loans that have been past due for a range of durations
+
+- Creating some date variables for further analysis
+```{r}
+loans$ListDate = as.Date(as.character(loans$ListingCreationDate),"%Y-%m-%d %H:%M:%S")
+loans$LoanDate = as.Date(as.character(loans$LoanOriginationDate),"%Y-%m-%d %H:%M:%S")
+
+```
+
+- Listings according to the years
+
+```{r}
+loans$ListYear = year(loans$ListDate)
+year_lables=factor(2005:2014)
+ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=ListYear))+geom_bar() + scale_x_continuous(breaks=c(2005:2014),labels=year_labels) +scale_y_continuous(labels=percent)+ylab("Percentage of loans")
+```
+- Only about 25% of the listings belong to the pre-2009 period. From 2009, we see a steady increase in the number of listings. For 2014, we have data only until the month of march, and hence we see a lesser number of listings than in 2014.
+
+- Typical time between listing and loan approval 
+
+```{r}
+loans$DaysElapsed = as.numeric(difftime(loans$LoanDate,loans$ListDate))
+summary(loans$DaysElapsed)
+
+```
+-The minimum number of days between listing of a loan and its approval is 1 day. The median time gap is 9 days, with 50% of the loans originating between 5 and 13 days. Let us have a look at the 99 percentile value of the number of days elapsed.
+
+```{r}
+quantile(loans$DaysElapsed,0.99)
+```
+-Basically, 99% of the loans were originated within 3 months of the date the loan was originally listed. However, we could see that the longest time it took for a loan to get approved was 1095 days. In general it would be interesting to analyze these 1% of the loans which took longer than 90 days to get approved. This shall be taken up later.
+
+-Percentage of different credit grades among the loans
+```{r}
+ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=CreditGrade))+geom_bar() + scale_y_continuous(labels=percent) +ylab("Percentage of loans")
+```
+
+
+- It is to be noted that the "CreditGrade" variable is applicable to only those loans prior to 2009, which as we saw earlier constituted only about 25% of the listings. The above plot hence does not show any credit grade for 75% of the data. Following 2009, instead of CreditGrade, the variable "ProsperRating" was used for assessing loans. Let's have a look at that. 
+
+```{r}
+ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=ProsperRating..Alpha.))+geom_bar() + scale_y_continuous(labels=percent)+ylab("Percentage of loans")
+```
+
+- For the loans in the post 2009 period, we see that the majority were assigned a C grade, while A, B and D grades were quite close in number. Just over 5% of the listings were classified under the HR category. Now it would be interesting to see if it is these high risk loans that took the longest time to get originated. This shall be a question we will look into later. But before that let us look into some other variables.
+
+-Loan Amounts
+
+
+```{r}
+### These plots need re-plotting
+p1 = ggplot(data=loans,aes(x=LoanOriginalAmount))+geom_histogram(binwidth=1000,center=500,color='blue')+scale_x_continuous(breaks=seq(0,30000,by=4000),limits=c(0,40000)) 
+
+p2 = ggplot(data=loans,aes("loanAmount",LoanOriginalAmount))+geom_boxplot() 
+
+grid.arrange(p1,p2,ncol=2)
+
+
+```
+```{r}
+boxplot(loans$LoanOriginalAmount) 
+```
+```{r}
+summary(loans$LoanOriginalAmount)
+```
+
+- Almost 50% of the loans are between $4000 and $8500, with a median value for loan amount at $6500. From the boxplot we can see a bunch of data points that have been classified as outliers. The interquartile range is $8000 and based on this, the position of the top whisker should be at $24000. Let us see the number of "outliers" in the dataset with respect to LoanAmount.
+
+```{r}
+nrow(subset(loans,LoanOriginalAmount>24000))
+```
+-Which is about 4% of the listings in the dataset. Let us also look at the typical term of loans
+
+```{r}
+table(loans$Term)*100/nrow(loans)
+```
+- The loans are of either 1 year, 2 years or 5 years durations, with 77% of the listings falling in the 2 year scheme. Let us look at the APR and Interest rates
+```{r}
+interest.par <- par(mfrow=c(1, 2))
+boxplot(loans$BorrowerAPR, main="APR")
+boxplot(loans$BorrowerRate,main="Interest Rate")
+par(interest.par)
+
+```
+-- Interest rates are low for Prosper loans, with the APR and borrower interest rate touching at most 0.5%, with most of the loans remaining between 0.1-0.3% range
+
+Now lets have a look at the income statistics of the borrowers.
+```{r}
+p1 = ggplot(data=loans,aes(x=IncomeRange))+geom_bar(color='blue')
+
+p2 = ggplot(data=loans,aes("loanAmount",StatedMonthlyIncome))+geom_boxplot() 
+
+grid.arrange(p1,p2,ncol=2)
+```
+
+
+
+
 

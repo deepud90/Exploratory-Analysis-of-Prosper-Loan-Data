@@ -164,7 +164,12 @@ p2 = ggplot(data=loans,aes("loanAmount",StatedMonthlyIncome))+geom_boxplot()
 grid.arrange(p1,p2,ncol=2)
 ```
 
+-No. of borrowers according to state
+```{r, fig.width=6,fig.align='center'} 
+##This has to be replotted
+ ggplot(data=loans,aes(x=BorrowerState),width=5)+geom_bar(color='blue')
 
+```
 
 
 

@@ -16,7 +16,7 @@ library(gridExtra)
 
 #Read and summarise the data. 
 ```{r,warning=FALSE,message=FALSE}
-#loans = read.csv("prosperLoanData.csv")
+loans = read.csv("prosperLoanData.csv")
 #for occasional viewing of subset of data
 #loans_sub = loans[1:100,]
 ```
@@ -65,7 +65,7 @@ The other columns with missing values have under 10% values missing. These shall
 - Percentage of different loan statuses
 
 ```{r}
-ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=LoanStatus))+geom_bar() + scale_y_continuous(labels=percent) +  coord_flip()+ylab("Percentage of loans")
+ggplot(data=loans,aes(y=(..count..)*100/sum(..count..),x=LoanStatus))+geom_bar() + scale_y_continuous() +  coord_flip()+ylab("Percentage of loans")
 
 ```
 
@@ -82,8 +82,8 @@ loans$LoanDate = as.Date(as.character(loans$LoanOriginationDate),"%Y-%m-%d %H:%M
 
 ```{r}
 loans$ListYear = year(loans$ListDate)
-year_lables=factor(2005:2014)
-ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=ListYear))+geom_bar() + scale_x_continuous(breaks=c(2005:2014),labels=year_labels) +scale_y_continuous(labels=percent)+ylab("Percentage of loans")
+year_labels=factor(2005:2014)
+ggplot(data=loans,aes(y=(..count..)*100/sum(..count..),x=ListYear))+geom_bar() + scale_x_continuous(breaks=c(2005:2014),labels=year_labels) +scale_y_continuous()+ylab("Percentage of loans")
 ```
 - Only about 25% of the listings belong to the pre-2009 period. From 2009, we see a steady increase in the number of listings. For 2014, we have data only until the month of march, and hence we see a lesser number of listings than in 2014.
 
@@ -110,7 +110,7 @@ ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=CreditGrade))+geom_bar() + 
 - It is to be noted that the "CreditGrade" variable is applicable to only those loans prior to 2009, which as we saw earlier constituted only about 25% of the listings. The above plot hence does not show any credit grade for 75% of the data. Following 2009, instead of CreditGrade, the variable "ProsperRating" was used for assessing loans. Let's have a look at that. 
 
 ```{r}
-ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=ProsperRating..Alpha.))+geom_bar() + scale_y_continuous(labels=percent)+ylab("Percentage of loans")
+ggplot(data=loans,aes(y=(..count..)*100/sum(..count..),x=ProsperRating..Alpha.))+geom_bar() + scale_y_continuous()+ylab("Percentage of loans")
 ```
 
 - For the loans in the post 2009 period, we see that the majority were assigned a C grade, while A, B and D grades were quite close in number. Just over 5% of the listings were classified under the HR category. Now it would be interesting to see if it is these high risk loans that took the longest time to get originated. This shall be a question we will look into later. But before that let us look into some other variables.
@@ -120,11 +120,11 @@ ggplot(data=loans,aes(y=(..count..)/sum(..count..),x=ProsperRating..Alpha.))+geo
 
 ```{r}
 ### These plots need re-plotting
-p1 = ggplot(data=loans,aes(x=LoanOriginalAmount))+geom_histogram(binwidth=1000,center=500,color='blue')+scale_x_continuous(breaks=seq(0,30000,by=4000),limits=c(0,40000)) 
+p1 = ggplot(data=loans,aes(x=LoanOriginalAmount))+geom_histogram(binwidth=1000,center=500,color='blue')+scale_x_continuous(breaks=seq(0,30000,by=5000),limits=c(0,40000))+ theme(axis.text.x=element_text(angle=45))
 
 p2 = ggplot(data=loans,aes("loanAmount",LoanOriginalAmount))+geom_boxplot() 
 
-grid.arrange(p1,p2,ncol=2)
+grid.arrange(p1,p2,ncol=2,widths=c(5,3))
 
 
 ```
@@ -157,19 +157,59 @@ par(interest.par)
 
 Now lets have a look at the income statistics of the borrowers.
 ```{r}
-p1 = ggplot(data=loans,aes(x=IncomeRange))+geom_bar(color='blue')
+p1 = ggplot(data=loans,aes(x=IncomeRange))+geom_bar(color='blue') + coord_flip()
 
-p2 = ggplot(data=loans,aes("loanAmount",StatedMonthlyIncome))+geom_boxplot() 
+p2 = ggplot(data=loans,aes("MonthlyIncome",StatedMonthlyIncome))+geom_boxplot() 
 
-grid.arrange(p1,p2,ncol=2)
+grid.arrange(p1,p2,ncol=2,widths=c(5,3))
 ```
 
--No. of borrowers according to state
-```{r, fig.width=6,fig.align='center'} 
-##This has to be replotted
- ggplot(data=loans,aes(x=BorrowerState),width=5)+geom_bar(color='blue')
+```{r}
+#test
+loans$BorrwerStateName = ""
+#get row index
+
+loans$BorrowerStateName =state.name[match(loans$BorrowerState,state.abb)]
+loans$BorrowerStateName[loans$BorrowerState=="DC"]="Washington DC" 
+loans$BorrowerStateName = tolower(loans$BorrowerStateName)
+
+map_plot_data = map_data("state")
+
+#as.data.frame(table(loans$BorrowerStateName))
+loan_count_by_state = as.data.frame(table(loans$BorrowerStateName))
+#merge with the map_data
+names(loan_count_by_state)=c("region","count")
+#combined = merge(map_plot_data,loan_count_by_state,by="region")
+combined= merge(x = map_plot_data, y = loan_count_by_state, by = "region", all.x = TRUE)
+
+#testing
+loan_count_by_state = loan_count_by_state[loan_count_by_state$region!=alaska,]
+
+
+
+p <- ggplot()
+p <- p + geom_polygon(data=combined, aes(x=long, y=lat, group = group, fill=combined$count),colour="white") + scale_fill_continuous(low = "thistle2", high = "darkred", guide="colorbar")
+p
+
+# p <- ggplot()
+# p <- p + geom_polygon(data=combined, aes(x=long, y=lat, group = group),colour="white")
+# p 
 
 ```
 
 
+
+```{r,fig.height=10,fig.width=7}
+
+ggplot(loans, aes(x=Occupation)) + geom_bar()+coord_flip() #geom_segment(aes(x=Occupation,xend=Occupation, y=0, yend=(..count..))) + 
+# theme(axis.text.x = element_text(angle=65, vjust=0.6))
+```
+
+-Stats on credit lines
+
+```{r}
+p1 = boxplot(loans$CurrentCreditLines)
+p2 = boxplot(loans$openCreditLines)
+grid.arrange(p1,p2)
+```
 

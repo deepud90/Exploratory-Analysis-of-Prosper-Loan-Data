@@ -7,7 +7,8 @@ body {
 text-align: justify}
 </style>
 
-##Introduction
+
+## Introduction
 
 Prosper is an online peer to peer lending platform that connects people who need money with those who are willing to loan the same for an interest. In contrast to the traditional lending systems such banks where the entire loan amount is funded by a single entity, prosper allows borrowing from multiple lenders. Borrowers do not need to pledge collateral while applying for loans, and the loan is approved based on a number of parameters that describe the background of the customers, including (but not limited to) their income, credit hisotry etc. For each application, prosper assigns a 'rating' and a prosper score, to describe the risk associated with the loan as well the probability of it going bad. 
 
@@ -17,7 +18,7 @@ In this work, I analyse historical data from Prosper for the period 2005-2014, t
  
  
 
-####Loading the packages required for the analysis
+#### Loading the packages required for the analysis
 
 ```r
 library(knitr)
@@ -28,7 +29,7 @@ library(gridExtra)
 library(scales)
 ```
 
-####Read and summarise the data. 
+#### Read and summarise the data. 
 
 ```r
 loans = read.csv("prosperLoanData.csv",na.strings=c("NA",""))
@@ -52,7 +53,7 @@ cols_interest = c("CreditGrade","Term","LoanStatus","ClosedDate","BorrowerAPR","
 ```
 
 
-####Data Sanctity Check
+#### Data Sanctity Check
 
 For the above mentioned columns, let us count the number and  percentage of NA values in them . Only those columns with at least one NA value is shown 
 
@@ -1063,7 +1064,7 @@ This work is only the tip of the iceberg when it comes to the number of things t
 
 This work turned out to be more challenging that I expected it to be when I chose to work on it. Nevertheless, the learning experience has been fullfilling, and I'm glad that I have made it so far with this analysis. It is only through challenges that one improves his or her skill, since tackling easy problems does not make you a better problem solver. Being a beginner data analyst, I'm sure there are plenty of shortcomings with this work, however, having been able to do at least as much as has been done in this work has improved my confidence immensly, and I believe I am better prepared now to tackle new datasets with even larger number of records and variables in the future.
 
-####References:
+#### References:
 1) https://www.prosper.com
 2) https://www.thebalance.com/before-you-borrow-at-prosper-com-315590
 

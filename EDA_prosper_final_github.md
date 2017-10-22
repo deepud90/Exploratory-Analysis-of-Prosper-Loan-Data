@@ -2,12 +2,6 @@
 
 
 
-<style>
-body {
-text-align: justify}
-</style>
-
-
 ## Introduction
 
 Prosper is an online peer to peer lending platform that connects people who need money with those who are willing to loan the same for an interest. In contrast to the traditional lending systems such banks where the entire loan amount is funded by a single entity, prosper allows borrowing from multiple lenders. Borrowers do not need to pledge collateral while applying for loans, and the loan is approved based on a number of parameters that describe the background of the customers, including (but not limited to) their income, credit hisotry etc. For each application, prosper assigns a 'rating' and a prosper score, to describe the risk associated with the loan as well the probability of it going bad. 

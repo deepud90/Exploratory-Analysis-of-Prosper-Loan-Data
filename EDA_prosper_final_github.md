@@ -144,7 +144,7 @@ The columns "EstimatedEffectiveYeild","EsimtatedLoss","ProsperScore", "ProsperRa
 Hence these columns do not require any missing value treatment. Additionally, the column CreditGrade has meaningful values only for those listings pre-2009. The other columns with missing data have less than 10% of their values missing. These shall be left as it is for now, and we will continue with the analysis.
 
 
-#Univariate Analysis
+# Univariate Analysis
 
 First of all, let us do make some univariate plots to get familiar with the dataset.
 
@@ -481,7 +481,7 @@ summary(loans$DebtToIncomeRatio)
 The median value is 0.220, and for half the loans the value lies between 0.32 and 0.14. These numbers sound reasonable. However, we do see some outliers, having Debt to Income Ratio (DTI) as high as 10.
 
 
-##Bivariate Analysis
+## Bivariate Analysis
 
 So far we have been looking at the data one variable at a time. This gives a brief overview and big picture of the dataset, however to answer more interesting questions, we need to go for bi-variate and multi-variate analysis. We start with bi-variate analysis. Although a general investigation of the dataset through plotting each variable against the other would reveal a lot of insights, the number of variables in this dataset is far too large and consequently, the number of questions that can be asked are also too many. Hence, it is important that to develop a central theme for this investigation, which would encompass a few broad questions we wish to be answered from the dataset. This will help us narrow down the scope of this analysis and develop fewer sub-questions for which we would like to get answers.
 
@@ -905,7 +905,7 @@ Higher income brackets tend to get a higher ProsperScore, which is afterall expe
 So far we have identified few factors influencing Prosper Score - DTI, TotalInquiries, Inquirieslast7 months, deliquencies last 7 years,CreditScoreRange and IncomeRange. Now it is time to do some multivariate analysis to identify the combined influence of these above variables on a loan default.
 
 
-#Multivariate Analysis
+# Multivariate Analysis
 
 With our bivariate analyses having identified the influence of some variables in determining the prosper scores, it is time to look at some multivariate plots. Multivariate plots  are helpful in visualizing the distribution of datapoints, segregated according to the loan default status. These might help us understand the combined influence of two (or more) variables in causing a loan default. We have observed so far that variables such as DTI, TotalInquiries, Inquirieslast7months, delinquencieslast7years have some influence on the prosper score, which in turn predicts the chances of a loan defaulting. Hence, let us now use multivariate plots to see their combined influence.
 
@@ -994,9 +994,9 @@ p1
 
 We can say that for a given number of credit lines, a customer with higher credit score is more likely to complete the loan. This is especially true for the cases where the number of credit lines is less than 30. As the number of credit lines increases furhter this trend becomes less clear.
 
-#Final Plots and Summary
+# Final Plots and Summary
 
-##PLOT 1: Historical Growth of the Prosper Business
+## PLOT 1: Historical Growth of the Prosper Business
 
 
 ```r
@@ -1014,7 +1014,7 @@ period 2008 Q4 - 2009 Q3 saw a severe reduction in their activity level, but per
 
 We can see from the above graph that the number of prosper loans  has been increasing from 2009 for the most part, with the business really taking off from Q2 2013. We can also see the historical trend of loan defaults, which is a critical metric to watch for with regard to the sucess of the Prosper Business. A dip in the default rates is observed after Q2 2008, although this could be due to the fact that the number of loans originated in Q2 of 2009 is very low. However the loans did start increasing again in number from Q3 of 2009 and yet we observe that the default rates are lower for the loans originated during the Q3 2009 to Q4 2010, in comparison to the pre 2009 era. The default rate line is only helpful for the period until 2010 Q4, since some of the loans originated from 2011 Q1 are still on-going, which makes default rate shown less meaningful. As such, though it is difficult to conclude that default rates have lowered since 2009, we can suspect this is indeed the case, from whatever data that is available.
 
-##PLOT 2: Effectiveness of ProsperScore variable in predicting the chance of a loan defaulting
+## PLOT 2: Effectiveness of ProsperScore variable in predicting the chance of a loan defaulting
 
 
 ```r
@@ -1026,7 +1026,7 @@ ggtitle("Prosper Score") + theme(plot.title = element_text(hjust = 0.5))
 
 The second plot was chosen to be this, because it answers our second major question at the beginning of the analysis, i.e, how good is Prosper in identifying good vs bad loans. The above plot somewhat answers this question. We see that as the prosper score increases, the chances of a loan defaulting continually keeps going down, indicating that the metric is quite effective in predicting a bad loan. In fact, identifying this fact inspired this analysis to take a direction towards identifying those factors that contribute to better Prosper Score (and consequently, better loans). Such an analysis led us to identifying few variables that helps improve the prosper score, namely, Debt To Income Ratio (DTI), Total Inquiries into the customer's  credit profile at the time it was pulled, Inquiries into the customer's credit profile in the 7 months prior to the evaluation of the loan application, number of deliquencies in the  last 7 years and IncomeRange of the customers. 
 
-##PLOT 3: Multivariate visualization of variables influencing Loan Default
+## PLOT 3: Multivariate visualization of variables influencing Loan Default
 
 
 ```r

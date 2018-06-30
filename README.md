@@ -4,4 +4,5 @@ Prosper is an online peer to peer lending platform that connects people who need
 
 This work is performed completely in R. Please refer to the file "EDA_prosper_final_github.md" for the detailed data exploration process (including R code as well as the descriptions). The dataset, as well as a description of the variables found in the same can be found in the link below
 
+https://drive.google.com/open?id=1o3NIAYic51xEeW8rmgB399o390u_r_vO
 https://drive.google.com/drive/folders/1o9YowpZqoeqsc3tI5DE3h83o1iC3Lzon?usp=sharing
